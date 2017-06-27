@@ -5,6 +5,7 @@
 !*/
 
 # Whitelist git files
+!.gitkeep
 !.gitignore
 !.gitmodules
 
