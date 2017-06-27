@@ -1,26 +1,27 @@
 #include <stdio.h>
 #include "vm.h"
+#include "compiler.h"
 
 int main() {
-    uint64_t prog[] = { 
-        PUSH, 10,
-        PUSH, 2, 
-        MUL, 
-        PRINT, 
-        HALT
-    };
+    dlvm_lang_scanner_t scanner;
 
-    printf("Hello World!");
-    printf("Hello World!");
+    dlvm_lang_init_scanner(&scanner, " 1000 + 100\n");
 
-    stack_t *stack = stack_init(100);
-    program_t *program = malloc(sizeof(program_t));
-    program->program = prog;
-    program->program_size = 6;
+    while (scanner.peek.kind != DLVM_LANG_TOKEN_UNKNOWN) {
+        dlvm_lang_token_t token = dlvm_lang_eat_token(&scanner);
 
-    dlvm_t *vm = dlvm_init(program, stack);
-
-    dlvm_exec(vm);
+        switch (token.kind) {
+            case DLVM_LANG_TOKEN_NUMBER:
+                printf("{ kind = %s, ivalue = %d }\n", "NUMBER", token.ivalue) ;
+                break;
+            case DLVM_LANG_TOKEN_PLUS:
+                printf("{ kind = %s }\n", "PLUS") ;
+                break;
+            case DLVM_LANG_TOKEN_UNKNOWN:
+                printf("{ kind = %s }\n", "UNKNOWN") ;
+                break;
+        }
+    }
 
     return 0;
 }

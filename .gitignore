@@ -1,0 +1,16 @@
+# First, ignore everything
+*
+
+# Left all directories live
+!*/
+
+# Whitelist git files
+!.gitignore
+!.gitmodules
+
+# Whitelist C files
+!*.c
+!*.h
+
+# Whitelist .vscode as all my build options are in there
+!.vscode/*

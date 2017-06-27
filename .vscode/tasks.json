@@ -7,13 +7,20 @@
     "echoCommand": true,
     "args": [ 
         // All files to compile
-        "main.c", 
+        // - dlvm
         "libs/dlvm/src/types.c",
         "libs/dlvm/src/vm.c",
 
+        // - dlvm-lang
+        "main.c", 
+        "src/compiler.c",
+
         // All include foldes
-        "-Isrc",
+        // - dlvm
         "-Ilibs/dlvm/src",
+
+        // - dlvm-lang
+        "-Isrc",
         
         "-o", "bin/main", "-Wall", "-std=c99"
      ],
