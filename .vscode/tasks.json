@@ -1,0 +1,47 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "0.1.0",
+    "command": "gcc",
+    "isShellCommand": true,
+    "echoCommand": true,
+    "args": [ 
+        // All files to compile
+        "main.c", 
+        "libs/dlvm/src/types.c",
+        "libs/dlvm/src/vm.c",
+
+        // All include foldes
+        "-Isrc",
+        "-Ilibs/dlvm/src",
+        
+        "-o", "bin/main", "-Wall", "-std=c99"
+     ],
+     "windows": {
+         "args": [ ]
+     },
+     "linux": {
+         "args": [  ]
+     },
+
+     
+    "showOutput": "always",
+
+    "tasks": [
+        {
+            "taskName": "release",
+            "args": [
+                "-O2"
+            ],
+            "suppressTaskName": true
+        },
+        {
+            "taskName": "debug",
+            "args": [
+                "-ggdb"
+            ],
+            "isBuildCommand": true,
+            "suppressTaskName": true
+        }
+    ]
+}

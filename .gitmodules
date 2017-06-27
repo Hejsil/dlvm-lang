@@ -1,0 +1,3 @@
+[submodule "libs/dlvm"]
+	path = libs/dlvm
+	url = https://github.com/ksteensig/dlvm.git
