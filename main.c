@@ -8,7 +8,7 @@ int main() {
     dlvm_lang_scanner_t scanner;
     dlvm_lang_parser_t parser;
 
-    dlvm_lang_init_scanner(&scanner, "(1 + 1) - 1");
+    dlvm_lang_init_scanner(&scanner, "5 / 2");
     dlvm_lang_init_parser(&parser, scanner);
 
     dlvm_lang_ast_node_t* ast = dlvm_lang_parse_expression(&parser);

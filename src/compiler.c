@@ -20,7 +20,7 @@ dlvm_lang_token_t dlvm_lang_make_token(uint8_t kind, dlvm_lang_position_t positi
     dlvm_lang_token_t result;
     result.kind = kind;
     result.position = position;
-    
+
     return result;
 }
 
@@ -88,14 +88,20 @@ dlvm_lang_token_t dlvm_lang_eat_token(dlvm_lang_scanner_t* scanner) {
         case '+':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_ADD, position);
             break;
+        case '-':
+            scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_SUB, position);
+            break;
+        case '*':
+            scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_MUL, position);
+            break;
+        case '/':
+            scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_DIV, position);
+            break;
         case '(':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_PAR_LEFT, position);
             break;
         case ')':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_PAR_RIGHT, position);
-            break;
-        case '-':
-            scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_SUB, position);
             break;
         default:
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_UNKNOWN, position);
@@ -138,8 +144,7 @@ dlvm_lang_ast_node_t* dlvm_lang_parse_term(dlvm_lang_parser_t* parser) {
 
         case DLVM_LANG_TOKEN_PAR_LEFT: {
             dlvm_lang_ast_node_t* expr = dlvm_lang_parse_expression(parser);
-            if (expr == NULL)
-                return NULL;
+            if (expr == NULL) return NULL;
 
             dlvm_lang_token_t right_par = dlvm_lang_eat_token(&parser->scanner);
             if (right_par.kind != DLVM_LANG_TOKEN_PAR_RIGHT) {
@@ -194,17 +199,15 @@ dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_int_lit(dlvm_lang_position_t position,
 
 void dlvm_lang_dealloc_ast(dlvm_lang_ast_node_t* ast) {
     if (ast->kind & IS_BINARY) {
-        dlvm_lang_dealloc_ast_binary(ast);
+        dlvm_lang_dealloc_ast(ast->binary.left);
+        dlvm_lang_dealloc_ast(ast->binary.right);
+        free(ast);
+    } else if (ast->kind & IS_UNARY) {
+        dlvm_lang_dealloc_ast(ast->unary.child);
+        free(ast);
     } else {
         free(ast);
     }
-}
-
-void dlvm_lang_dealloc_ast_binary(dlvm_lang_ast_node_t* ast) {
-    assert(ast->kind & IS_BINARY);
-    dlvm_lang_dealloc_ast(ast->binary.left);
-    dlvm_lang_dealloc_ast(ast->binary.right);
-    free(ast);
 }
 
 void dlvm_lang_print_ast(dlvm_lang_ast_node_t* ast, int64_t depth) {
@@ -238,6 +241,8 @@ void dlvm_lang_print_ast_binary(dlvm_lang_ast_node_t* binary, int64_t depth) {
     char* name = 
         kind == DLVM_LANG_AST_BINARY_ADD ? "ADD" :
         kind == DLVM_LANG_AST_BINARY_SUB ? "SUB" : 
+        kind == DLVM_LANG_AST_BINARY_MUL ? "MUL" : 
+        kind == DLVM_LANG_AST_BINARY_DIV ? "DIV" : 
         "???";
 
     dlvm_lang_print_ast_depth(depth);
@@ -309,6 +314,10 @@ dlvm_lang_value_t dlvm_lang_interpret_binary(dlvm_lang_ast_node_t* binary) {
                 return dlvm_lang_make_value_int(left_value.ivalue + right_value.ivalue);
             case DLVM_LANG_AST_BINARY_SUB:
                 return dlvm_lang_make_value_int(left_value.ivalue - right_value.ivalue);
+            case DLVM_LANG_AST_BINARY_MUL:
+                return dlvm_lang_make_value_int(left_value.ivalue * right_value.ivalue);
+            case DLVM_LANG_AST_BINARY_DIV:
+                return dlvm_lang_make_value_int(left_value.ivalue / right_value.ivalue);
             default:
                 assert(false);
                 return dlvm_lang_make_value_fuck();
@@ -323,6 +332,10 @@ dlvm_lang_value_t dlvm_lang_interpret_binary(dlvm_lang_ast_node_t* binary) {
             return dlvm_lang_make_value_float(left_double + right_double);
         case DLVM_LANG_AST_BINARY_SUB:
             return dlvm_lang_make_value_float(left_double - right_double);
+        case DLVM_LANG_AST_BINARY_MUL:
+            return dlvm_lang_make_value_float(left_double * right_double);
+        case DLVM_LANG_AST_BINARY_DIV:
+            return dlvm_lang_make_value_float(left_double / right_double);
         default:
             assert(false);
             return dlvm_lang_make_value_fuck();

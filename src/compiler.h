@@ -11,10 +11,15 @@ typedef struct dlvm_lang_position_s {
 
 typedef enum dlvm_lang_token_kind_e {
     DLVM_LANG_TOKEN_NUMBER    = 0x00,
+
     DLVM_LANG_TOKEN_PAR_LEFT  = 0x01,
     DLVM_LANG_TOKEN_PAR_RIGHT = 0x02,
+
     DLVM_LANG_TOKEN_ADD       = 0x00 | IS_BINARY,
     DLVM_LANG_TOKEN_SUB       = 0x01 | IS_BINARY,
+    DLVM_LANG_TOKEN_MUL       = 0x02 | IS_BINARY,
+    DLVM_LANG_TOKEN_DIV       = 0x03 | IS_BINARY,
+
     DLVM_LANG_TOKEN_UNKNOWN   = 0xFF & ~IS_BINARY & ~IS_UNARY,
 } dlvm_lang_token_kind_t;
 
@@ -39,8 +44,12 @@ typedef struct dlvm_lang_scanner_s {
 
 typedef enum dlvm_lang_ast_kind_e {
     DLVM_LANG_AST_LITERAL_INT = 0x00,
+
     DLVM_LANG_AST_BINARY_ADD  = DLVM_LANG_TOKEN_ADD,
     DLVM_LANG_AST_BINARY_SUB  = DLVM_LANG_TOKEN_SUB,
+    DLVM_LANG_AST_BINARY_MUL  = DLVM_LANG_TOKEN_MUL,
+    DLVM_LANG_AST_BINARY_DIV  = DLVM_LANG_TOKEN_DIV,
+    
     DLVM_LANG_AST_UNARY_PAR   = 0x00 | IS_UNARY
 } dlvm_lang_ast_kind_t;
 
@@ -108,7 +117,6 @@ dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_unary(dlvm_lang_position_t position, i
 dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_binary(dlvm_lang_position_t position, int8_t ast_kind, dlvm_lang_ast_node_t* left, dlvm_lang_ast_node_t* right);
 dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_int_lit(dlvm_lang_position_t position, int64_t value);
 void dlvm_lang_dealloc_ast(dlvm_lang_ast_node_t* ast);
-void dlvm_lang_dealloc_ast_binary(dlvm_lang_ast_node_t* ast);
 
 void dlvm_lang_print_ast(dlvm_lang_ast_node_t* ast, int64_t depth);
 void dlvm_lang_print_ast_int_lit(dlvm_lang_ast_node_t* int_lit, int64_t depth);
