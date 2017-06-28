@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "vm.h": "c",
+        "compiler.h": "c",
+        "assert.h": "c",
+        "types.h": "c",
+        "stdlib.h": "c",
+        "opcodes.h": "c"
+    }
+}
