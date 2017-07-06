@@ -1,17 +1,37 @@
 #include <stdio.h>
 #include "vm.h"
-#include "compiler.h"
+#include "hp_inkjet.h"
+#include "parsing.h"
+#include "interpret.h"
 
 int main() {
+    
     char buffer[1000];
 
+    /*
+    uint64_t prog[] = {PUSH, INT, 10, PUSH, INT, 2, MUL, PRINT, HALT};
+
+    stack_t *stack = stack_init(100);
+    program_t *program = malloc(sizeof(program_t));
+    program->program = prog;
+    program->program_size = 6;
+
+    dlvm_t *vm = dlvm_init(program, stack);
+
+    dlvm_exec(vm);
+
+    scanf("%s", buffer);
+    return 0;
+    /**/
+
     dlvm_lang_scanner_t scanner;
-    dlvm_lang_parser_t parser;
 
-    dlvm_lang_init_scanner(&scanner, "5 / 2");
-    dlvm_lang_init_parser(&parser, scanner);
+    dlvm_lang_init_scanner(
+        &scanner, 
+        "5 / 2.0"
+    );
 
-    dlvm_lang_ast_node_t* ast = dlvm_lang_parse_expression(&parser);
+    dlvm_lang_ast_node_t* ast = dlvm_lang_parse_expression(&scanner);
     dlvm_lang_print_ast(ast, 0);
 
     dlvm_lang_value_t value = dlvm_lang_interpret(ast);
@@ -39,7 +59,8 @@ int main() {
     }
     */
 
-    scanf("%s", buffer);
 
+
+    scanf("%s", buffer);
     return 0;
 }

@@ -5,6 +5,16 @@
         "assert.h": "c",
         "types.h": "c",
         "stdlib.h": "c",
-        "opcodes.h": "c"
+        "opcodes.h": "c",
+        "ast.h": "c",
+        "stdint.h": "c",
+        "compiler.c": "cpp",
+        "ast.c": "cpp",
+        "stdio.h": "c",
+        "parsing.c": "cpp",
+        "hp_ink_jet.c": "cpp",
+        "interpret.h": "c",
+        "c_emitter.h": "c",
+        "op.h": "c"
     }
 }

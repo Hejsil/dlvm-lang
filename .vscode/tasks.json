@@ -8,12 +8,17 @@
     "args": [ 
         // All files to compile
         // - dlvm
-        //"libs/dlvm/src/types.c",
-        //"libs/dlvm/src/vm.c",
+        "libs/dlvm/src/types.c",
+        "libs/dlvm/src/vm.c",
 
         // - dlvm-lang
         "main.c", 
-        "src/compiler.c",
+        "src/interpret.c",
+        "src/parsing.c",
+        "src/ast.c",
+        "src/hp_inkjet.c",
+        "src/backends/c_emitter.c",
+        "src/backends/dlvm_emitter.c",
 
         // All include foldes
         // - dlvm
@@ -21,8 +26,9 @@
 
         // - dlvm-lang
         "-Isrc",
+        "-Isrc/backends",
         
-        "-o", "bin/main", "-std=c11", 
+        "-o", "bin/main", "-Wall", "-std=c11",
 
         // Features
         "-fstrict-aliasing",
