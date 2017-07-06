@@ -9,7 +9,7 @@ typedef struct dlvm_lang_scanner_s {
     dlvm_lang_token_t peek;
 } dlvm_lang_scanner_t;
 
-void dlvm_lang_init_scanner(dlvm_lang_scanner_t* scanner, char* text);
+dlvm_lang_scanner_t dlvm_lang_make_scanner(char* text);
 char dlvm_lang_peek_char(dlvm_lang_scanner_t* scanner);
 char dlvm_lang_eat_char(dlvm_lang_scanner_t* scanner);
 void dlvm_lang_skip(dlvm_lang_scanner_t* scanner);

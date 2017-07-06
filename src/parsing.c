@@ -8,15 +8,18 @@
 #define NEWLINE '\n'
 
 // Scanner functions
-void dlvm_lang_init_scanner(dlvm_lang_scanner_t* scanner, char* text) {
-    scanner->text_size = strlen(text);
-    scanner->text = text;
-    // We always start at line 1, for user readability
-    scanner->position = dlvm_lang_make_position(0, 1, 0);
+dlvm_lang_scanner_t dlvm_lang_make_scanner(char* text) {
+    dlvm_lang_scanner_t result = (dlvm_lang_scanner_t){
+        .text_size = strlen(text),
+        .text = text,
+        .position = dlvm_lang_make_position(0, 1, 0)
+    };
 
     // Eating will scan a new token as the peek, and return the old one.
     // We can therefor call it here, as it will initialize our peek token.
-    dlvm_lang_eat_token(scanner);
+    dlvm_lang_eat_token(&result);
+
+    return result;
 }
 
 char dlvm_lang_peek_char(dlvm_lang_scanner_t* scanner) {

@@ -9,10 +9,8 @@
 
 // AST functions
 dlvm_lang_value_t dlvm_lang_interpret(dlvm_lang_ast_node_t* ast) {
-    dlvm_lang_value_t result;
     if (ast->kind & DLVM_LANG_IS_BINARY) {
-        result = dlvm_lang_interpret_binary(ast);
-        return result;
+        return dlvm_lang_interpret_binary(ast);
     } else {
         switch (ast->kind) {
             case DLVM_LANG_AST_LITERAL_INT:
@@ -49,32 +47,24 @@ dlvm_lang_value_t dlvm_lang_interpret_binary(dlvm_lang_ast_node_t* binary) {
                 return dlvm_lang_make_value_int(left_value.ivalue * right_value.ivalue);
             case DLVM_LANG_AST_BINARY_DIV:
                 return dlvm_lang_make_value_int(left_value.ivalue / right_value.ivalue);
-            default:
-                assert(false);
-                return dlvm_lang_make_value_fuck();
         }
+        
+        assert(false);
+        return dlvm_lang_make_value_fuck();
     }
     
     double left_double = to_double(left_value);
     double right_double = to_double(right_value);
-    dlvm_lang_value_t result;
 
     switch (binary->kind) {
         case DLVM_LANG_AST_BINARY_ADD:
-            result = dlvm_lang_make_value_float(left_double + right_double);
-            return result;
+            return dlvm_lang_make_value_float(left_double + right_double);
         case DLVM_LANG_AST_BINARY_SUB:
-            result = dlvm_lang_make_value_float(left_double - right_double);
-            return result;
+            return dlvm_lang_make_value_float(left_double - right_double);
         case DLVM_LANG_AST_BINARY_MUL:
-            result = dlvm_lang_make_value_float(left_double * right_double);
-            return result;
+            return dlvm_lang_make_value_float(left_double * right_double);
         case DLVM_LANG_AST_BINARY_DIV:
-            result = dlvm_lang_make_value_float(left_double / right_double);
-            return result;
-        default:
-            assert(false);
-            return dlvm_lang_make_value_fuck();
+            return dlvm_lang_make_value_float(left_double / right_double);
     }
 
     assert(false);
@@ -88,8 +78,7 @@ dlvm_lang_value_t dlvm_lang_make_value_int(int64_t value) {
 }
 
 dlvm_lang_value_t dlvm_lang_make_value_float(double value) {
-    dlvm_lang_value_t result = (dlvm_lang_value_t){ .kind = DLVM_LANG_VALUE_FLOAT, .fvalue = value };
-    return result;
+    return (dlvm_lang_value_t){ .kind = DLVM_LANG_VALUE_FLOAT, .fvalue = value };
 }
 
 dlvm_lang_value_t dlvm_lang_make_value_fuck() {
