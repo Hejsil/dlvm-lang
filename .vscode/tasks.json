@@ -8,8 +8,8 @@
     "args": [ 
         // All files to compile
         // - dlvm
-        "libs/dlvm/src/types.c",
-        "libs/dlvm/src/vm.c",
+        //"libs/dlvm/src/types.c",
+        //"libs/dlvm/src/vm.c",
 
         // - dlvm-lang
         "main.c", 
@@ -22,7 +22,55 @@
         // - dlvm-lang
         "-Isrc",
         
-        "-o", "bin/main", "-Wall", "-std=c99"
+        "-o", "bin/main", "-std=c11", 
+
+        // Features
+        "-fstrict-aliasing",
+
+        // Warnings
+        "-Wall", "-Wextra", "-Wunused", "-Wformat", "-Wparentheses", // "-Wconversion", We want this
+        "-Wfatal-errors", 
+        "-Wchkp",
+        "-Wdouble-promotion",
+        "-Wformat-overflow=2",
+        "-Wformat-truncation=2",
+        "-Wnull-dereference",
+        "-Winit-self",
+        "-Wimplicit-fallthrough=1",
+        "-Wmisleading-indentation",
+        "-Wmissing-include-dirs",
+        "-Wunused-parameter",
+        "-Wuninitialized",
+        "-Wstrict-aliasing",
+        "-Wstrict-overflow=5",
+        "-Wstringop-overflow=4",
+        "-Wsuggest-attribute=pure",
+        "-Wsuggest-attribute=const",
+        "-Wsuggest-attribute=noreturn",
+        "-Wsuggest-attribute=format",
+        "-Wmissing-format-attribute",
+        "-Walloc-zero",
+        "-Wduplicated-branches",
+        "-Wduplicated-cond",
+        // "-Wtraditional-conversion" enum values are casted when passed to uint8_t, so we are bombared with warnings
+        // "-Wdeclaration-after-statement", don't know if we really want this
+        "-Wshadow",
+        "-Wunsafe-loop-optimizations",
+        "-Wpointer-arith",
+        "-Wbad-function-cast",
+        "-Wcast-qual",
+        "-Wcast-align",
+        // "-Wwrite-strings", enable this when we can change the real source code again
+        "-Wjump-misses-init",
+        "-Wlogical-op",
+        // "-Waggregate-return", We probably don't want this, unless we can avoid it easily
+        "-Wno-aggressive-loop-optimizations",
+        // "-Wold-style-definition", Figure out what this means
+        // "-Wmissing-prototypes", Maybe
+        // "-Wmissing-declarations",
+        "-Wredundant-decls",
+        "-Wrestrict",
+        "-Winline"
      ],
      "windows": {
          "args": [ ]
@@ -38,13 +86,14 @@
         {
             "taskName": "release",
             "args": [
-                "-O2"
+                "-O3"
             ],
             "suppressTaskName": true
         },
         {
             "taskName": "debug",
             "args": [
+                //"-mmpx", "-fcheck-pointer-bounds", 
                 "-ggdb"
             ],
             "isBuildCommand": true,
