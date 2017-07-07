@@ -9,6 +9,7 @@ typedef struct dlvm_lang_compiler_s {
 typedef enum dlvm_lang_value_kind_e {
     DLVM_LANG_VALUE_INT,
     DLVM_LANG_VALUE_FLOAT,
+    DLVM_LANG_VALUE_STRING,
     DLVM_LANG_VALUE_UNDEFINED
 } dlvm_lang_value_kind_t;
 
@@ -18,6 +19,7 @@ typedef struct dlvm_lang_value_s {
     union {
         int64_t ivalue;
         double fvalue;
+        char* svalue;
     };
 } dlvm_lang_value_t;
 
@@ -29,6 +31,7 @@ dlvm_lang_value_t dlvm_lang_interpret_unary(dlvm_lang_ast_node_t* unary);
 // Value functions
 dlvm_lang_value_t dlvm_lang_make_value_int(int64_t value);
 dlvm_lang_value_t dlvm_lang_make_value_float(double value);
+dlvm_lang_value_t dlvm_lang_make_value_string(char* value);
 dlvm_lang_value_t dlvm_lang_make_value_undefined();
 
 void dlvm_lang_print_value(dlvm_lang_value_t value);

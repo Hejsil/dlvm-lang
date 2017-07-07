@@ -63,15 +63,29 @@ dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_float_lit(dlvm_lang_position_t positio
     return result;
 }
 
+dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_string_lit(dlvm_lang_position_t position, char* value) {
+    dlvm_lang_ast_node_t* result = dlvm_lang_alloc_ast(position, DLVM_LANG_AST_LITERAL_STRING);
+    result->string_lit.value = value;
+
+    return result;
+}
+
 void dlvm_lang_dealloc_ast(dlvm_lang_ast_node_t* ast) {
     if (ast->kind & DLVM_LANG_IS_BINARY) {
         dlvm_lang_dealloc_ast(ast->binary.left);
         dlvm_lang_dealloc_ast(ast->binary.right);
-        free(ast);
     } else if (ast->kind & DLVM_LANG_IS_UNARY) {
         dlvm_lang_dealloc_ast(ast->unary.child);
-        free(ast);
     } else {
-        free(ast);
+        switch (ast->kind) {
+            case DLVM_LANG_AST_LITERAL_STRING:
+                free(ast->string_lit.value);
+                break;
+
+            default:
+                break;
+        }
     }
+
+    free(ast);
 }

@@ -16,6 +16,8 @@ dlvm_lang_value_t dlvm_lang_interpret(dlvm_lang_ast_node_t* ast) {
             return dlvm_lang_make_value_int(ast->int_lit.value);
         case DLVM_LANG_AST_LITERAL_FLOAT:
             return dlvm_lang_make_value_float(ast->float_lit.value);
+        case DLVM_LANG_AST_LITERAL_STRING:
+            return dlvm_lang_make_value_string(ast->string_lit.value);
         default:
             return dlvm_lang_make_value_undefined();
     }
@@ -97,6 +99,10 @@ dlvm_lang_value_t dlvm_lang_make_value_float(double value) {
     return (dlvm_lang_value_t){ .kind = DLVM_LANG_VALUE_FLOAT, .fvalue = value };
 }
 
+dlvm_lang_value_t dlvm_lang_make_value_string(char* value) {
+    return (dlvm_lang_value_t){ .kind = DLVM_LANG_VALUE_STRING, .svalue = value };
+}
+
 dlvm_lang_value_t dlvm_lang_make_value_undefined() {
     return (dlvm_lang_value_t){ .kind = DLVM_LANG_VALUE_UNDEFINED };
 }
@@ -108,6 +114,9 @@ void dlvm_lang_print_value(dlvm_lang_value_t value) {
             break;
         case DLVM_LANG_VALUE_INT:
             printf("%" PRId64, value.ivalue);
+            break;
+        case DLVM_LANG_VALUE_STRING:
+            printf("%s", value.svalue);
             break;
         default:
             printf("UNDEFINED");

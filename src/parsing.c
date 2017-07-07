@@ -45,13 +45,12 @@ char dlvm_lang_eat_char(dlvm_lang_scanner_t* scanner) {
 
 dlvm_lang_token_t dlvm_lang_eat_token(dlvm_lang_scanner_t* scanner) {
     dlvm_lang_token_t eaten = scanner->peek;
+    
+    dlvm_lang_skip(scanner);
 
     // Store scanner->position locally, because scanner->position will change when we
     // eat chars
     dlvm_lang_position_t position = scanner->position;
-    
-    dlvm_lang_skip(scanner);
-
     char current = dlvm_lang_eat_char(scanner);
 
     if (isdigit(current)) {
@@ -99,21 +98,43 @@ dlvm_lang_token_t dlvm_lang_eat_token(dlvm_lang_scanner_t* scanner) {
         case '+':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_ADD, position);
             break;
+
         case '-':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_SUB, position);
             break;
+
         case '*':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_MUL, position);
             break;
+
         case '/':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_DIV, position);
             break;
+
         case '(':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_PAR_LEFT, position);
             break;
+
         case ')':
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_PAR_RIGHT, position);
             break;
+
+        case '"':
+            while (dlvm_lang_peek_char(scanner) != '"')
+                dlvm_lang_eat_char(scanner);
+
+            // We found the last '"'. We need to eat that char to
+            dlvm_lang_eat_char(scanner);
+
+            scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_STRING, position);
+
+            // We need to alloc for all chars between the '"', and one extra byte for the '\0'
+            size_t size = (size_t) (scanner->position.index - (position.index + 1));
+            scanner->peek.svalue = malloc(size);
+            strncpy(scanner->peek.svalue, &scanner->text[position.index + 1], size - 1);
+            scanner->peek.svalue[size - 1] = '\0';
+            break;
+
         default:
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_UNKNOWN, position);
             break;
@@ -149,6 +170,9 @@ dlvm_lang_ast_node_t* dlvm_lang_parse_term(dlvm_lang_scanner_t* scanner) {
 
         case DLVM_LANG_TOKEN_FLOAT:
             return dlvm_lang_alloc_ast_float_lit(start_token.position, start_token.fvalue);
+
+        case DLVM_LANG_TOKEN_STRING:
+            return dlvm_lang_alloc_ast_string_lit(start_token.position, start_token.svalue);
 
         case DLVM_LANG_TOKEN_PRINT: {
             dlvm_lang_ast_node_t* expr = dlvm_lang_parse_expression(scanner);
