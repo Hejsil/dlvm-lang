@@ -23,14 +23,11 @@ int main() {
     return 0;
     /**/
 
-    dlvm_lang_scanner_t scanner = dlvm_lang_make_scanner("5 / 2.0");
+    dlvm_lang_scanner_t scanner = dlvm_lang_make_scanner("print (5 + 5.0)");
     dlvm_lang_ast_node_t* ast = dlvm_lang_parse_expression(&scanner);
-    dlvm_lang_print_ast(ast, 0);
+    //dlvm_lang_print_ast(ast, 0);
 
     dlvm_lang_value_t value = dlvm_lang_interpret(ast);
-
-    printf("\n");
-    dlvm_lang_print_value(value);
 
     dlvm_lang_dealloc_ast(ast);
 
@@ -50,10 +47,7 @@ int main() {
                 break;
         }
     }
-    */
+    /**/
 
-
-
-    scanf("%s", buffer);
     return 0;
 }

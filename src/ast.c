@@ -20,7 +20,7 @@ dlvm_lang_token_t dlvm_lang_make_token(uint8_t kind, dlvm_lang_position_t positi
     return result;
 }
 
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast(dlvm_lang_position_t position, int8_t ast_kind) {
+dlvm_lang_ast_node_t* dlvm_lang_alloc_ast(dlvm_lang_position_t position, uint8_t ast_kind) {
     dlvm_lang_ast_node_t* result = malloc(sizeof(dlvm_lang_ast_node_t));
     result->kind = ast_kind;
     result->position = position;
@@ -28,7 +28,7 @@ dlvm_lang_ast_node_t* dlvm_lang_alloc_ast(dlvm_lang_position_t position, int8_t 
     return result;
 }
 
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_unary(dlvm_lang_position_t position, int8_t ast_kind, dlvm_lang_ast_node_t* child) {
+dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_unary(dlvm_lang_position_t position, uint8_t ast_kind, dlvm_lang_ast_node_t* child) {
     // Ensure that we only send unary operator kinds to this function
     assert(ast_kind & DLVM_LANG_IS_UNARY);
 
@@ -38,7 +38,7 @@ dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_unary(dlvm_lang_position_t position, i
     return result;
 }
 
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_binary(dlvm_lang_position_t position, int8_t ast_kind, dlvm_lang_ast_node_t* left, dlvm_lang_ast_node_t* right) {
+dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_binary(dlvm_lang_position_t position, uint8_t ast_kind, dlvm_lang_ast_node_t* left, dlvm_lang_ast_node_t* right) {
     // Ensure that we only send binary operator kinds to this function
     assert(ast_kind & DLVM_LANG_IS_BINARY);
 

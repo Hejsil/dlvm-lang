@@ -25,10 +25,7 @@ dlvm_lang_scanner_t dlvm_lang_make_scanner(char* text) {
 char dlvm_lang_peek_char(dlvm_lang_scanner_t* scanner) {
     assert(scanner->position.index >= 0);
 
-    if (scanner->position.index >= scanner->text_size) {
-        return EOT;
-    }
-
+    if (scanner->position.index >= scanner->text_size) return EOT;
     return scanner->text[scanner->position.index];
 }
 
@@ -36,8 +33,7 @@ char dlvm_lang_eat_char(dlvm_lang_scanner_t* scanner) {
     char result = dlvm_lang_peek_char(scanner);
     scanner->position.index++;
 
-    if (result == NEWLINE)
-    {
+    if (result == NEWLINE) {
         scanner->position.line++;
         scanner->position.column = 0;
         return result;
@@ -65,7 +61,7 @@ dlvm_lang_token_t dlvm_lang_eat_token(dlvm_lang_scanner_t* scanner) {
         // If no dot, then we are scanning a normal number
         if (dlvm_lang_peek_char(scanner) != '.') {
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_INT, position);
-            scanner->peek.ivalue = atoi(&scanner->text[position.index]);
+            scanner->peek.ivalue = strtoll(&scanner->text[position.index], NULL, 10);
             return eaten;
         }
 
@@ -81,7 +77,21 @@ dlvm_lang_token_t dlvm_lang_eat_token(dlvm_lang_scanner_t* scanner) {
             dlvm_lang_eat_char(scanner);
         
         scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_FLOAT, position);
-        scanner->peek.fvalue = atof(&scanner->text[position.index]);
+        scanner->peek.fvalue = strtod(&scanner->text[position.index], NULL);
+        return eaten;
+    }
+
+    if (isalpha(current)) {
+        while (isalpha(dlvm_lang_peek_char(scanner)))
+            dlvm_lang_eat_char(scanner);
+
+        const char* print = "print";
+        if (strncmp(&scanner->text[position.index], print, strlen(print)) == 0) {
+            scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_PRINT, position);
+            return eaten;
+        }
+
+        scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_UNKNOWN, position);
         return eaten;
     }
 
@@ -117,11 +127,9 @@ void dlvm_lang_skip(dlvm_lang_scanner_t* scanner) {
         dlvm_lang_eat_char(scanner);
 }
 
-// scanner Functions
 dlvm_lang_ast_node_t* dlvm_lang_parse_expression(dlvm_lang_scanner_t* scanner) {
     dlvm_lang_ast_node_t* top = dlvm_lang_parse_term(scanner);
-    if (top == NULL) 
-        return NULL;
+    if (top == NULL) return NULL;
 
     while (scanner->peek.kind & DLVM_LANG_IS_BINARY) {
         dlvm_lang_token_t op_token = dlvm_lang_eat_token(scanner);
@@ -138,8 +146,16 @@ dlvm_lang_ast_node_t* dlvm_lang_parse_term(dlvm_lang_scanner_t* scanner) {
     switch (start_token.kind) {
         case DLVM_LANG_TOKEN_INT:
             return dlvm_lang_alloc_ast_int_lit(start_token.position, start_token.ivalue);
+
         case DLVM_LANG_TOKEN_FLOAT:
             return dlvm_lang_alloc_ast_float_lit(start_token.position, start_token.fvalue);
+
+        case DLVM_LANG_TOKEN_PRINT: {
+            dlvm_lang_ast_node_t* expr = dlvm_lang_parse_expression(scanner);
+            if (expr == NULL) return NULL;
+
+            return dlvm_lang_alloc_ast_unary(start_token.position, start_token.kind, expr);
+        }
 
         case DLVM_LANG_TOKEN_PAR_LEFT: {
             dlvm_lang_ast_node_t* expr = dlvm_lang_parse_expression(scanner);
