@@ -13,5 +13,5 @@
 !*.c
 !*.h
 
-# Whitelist .vscode as all my build options are in there
-!.vscode/*
+# Whitelist CMakeLists
+!*/CMakeLists.txt
