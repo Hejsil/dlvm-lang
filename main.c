@@ -1,8 +1,7 @@
 #include <stdio.h>
-#include "vm.h"
-#include "hp_inkjet.h"
-#include "parsing.h"
-#include "interpret.h"
+#include "src/parsing.h"
+#include "src/hp_inkjet.h"
+#include "src/interpret.h"
 
 int main() {
     
@@ -26,7 +25,6 @@ int main() {
 
     dlvm_lang_scanner_t scanner = dlvm_lang_make_scanner("5 / 2.0");
     dlvm_lang_ast_node_t* ast = dlvm_lang_parse_expression(&scanner);
-    printf("%d", ast->binary.left->int_lit.value);
     dlvm_lang_print_ast(ast, 0);
 
     dlvm_lang_value_t value = dlvm_lang_interpret(ast);

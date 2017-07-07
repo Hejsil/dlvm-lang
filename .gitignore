@@ -14,4 +14,4 @@
 !*.h
 
 # Whitelist CMakeLists
-!*/CMakeLists.txt
+!*CMakeLists.txt
