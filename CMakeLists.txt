@@ -23,6 +23,6 @@ set(
     src/parsing.c
     src/parsing.h
     main.c
-)
+        src/data_structures/arraylist.c src/data_structures/arraylist.h)
 
 add_executable(dlvm_lang ${SOURCE_FILES})

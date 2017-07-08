@@ -24,7 +24,8 @@ typedef struct dlvm_lang_value_s {
 } dlvm_lang_value_t;
 
 // AST functions
-dlvm_lang_value_t dlvm_lang_interpret(dlvm_lang_ast_node_t* ast);
+void dlvm_lang_interpret(dlvm_lang_ast_node_t* ast);
+dlvm_lang_value_t dlvm_lang_interpret_expression(dlvm_lang_ast_node_t* expr);
 dlvm_lang_value_t dlvm_lang_interpret_binary(dlvm_lang_ast_node_t* add);
 dlvm_lang_value_t dlvm_lang_interpret_unary(dlvm_lang_ast_node_t* unary);
 

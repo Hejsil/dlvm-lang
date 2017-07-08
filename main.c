@@ -26,13 +26,13 @@ int main() {
     dlvm_lang_scanner_t scanner = dlvm_lang_make_scanner(
         "print print \"Hello World\n\""
         "print print 5 + 5.0 " // TODO, parsing many statements
-        "print 2 "
+        "print 2"
         "print 100"
     );
-    dlvm_lang_ast_node_t* ast = dlvm_lang_parse_expression(&scanner);
+    dlvm_lang_ast_node_t* ast = dlvm_lang_parse_statements(&scanner);
     //dlvm_lang_print_ast(ast, 0);
 
-    dlvm_lang_value_t value = dlvm_lang_interpret(ast);
+    dlvm_lang_interpret(ast);
 
     dlvm_lang_dealloc_ast(ast);
 

@@ -7,17 +7,37 @@
 
 
 // AST functions
-dlvm_lang_value_t dlvm_lang_interpret(dlvm_lang_ast_node_t* ast) {
-    if (ast->kind & DLVM_LANG_IS_BINARY) return dlvm_lang_interpret_binary(ast);
-    if (ast->kind & DLVM_LANG_IS_UNARY) return dlvm_lang_interpret_unary(ast);
-
+void dlvm_lang_interpret(dlvm_lang_ast_node_t* ast) {
     switch (ast->kind) {
+        case DLVM_LANG_AST_STATEMENTS: {
+            arraylist_t* list = &ast->statements.children;
+
+            for (int i = 0; i < list->count; i++) {
+                dlvm_lang_ast_node_t* child;
+                arraylist_get(list, i, &child);
+                dlvm_lang_interpret_expression(child);
+            }
+
+            break;
+        }
+
+        default:
+            assert(false);
+            break;
+    }
+}
+
+dlvm_lang_value_t dlvm_lang_interpret_expression(dlvm_lang_ast_node_t* expr) {
+    if (expr->kind & DLVM_LANG_IS_BINARY) return dlvm_lang_interpret_binary(expr);
+    if (expr->kind & DLVM_LANG_IS_UNARY) return dlvm_lang_interpret_unary(expr);
+
+    switch (expr->kind) {
         case DLVM_LANG_AST_LITERAL_INT:
-            return dlvm_lang_make_value_int(ast->int_lit.value);
+            return dlvm_lang_make_value_int(expr->int_lit.value);
         case DLVM_LANG_AST_LITERAL_FLOAT:
-            return dlvm_lang_make_value_float(ast->float_lit.value);
+            return dlvm_lang_make_value_float(expr->float_lit.value);
         case DLVM_LANG_AST_LITERAL_STRING:
-            return dlvm_lang_make_value_string(ast->string_lit.value);
+            return dlvm_lang_make_value_string(expr->string_lit.value);
         default:
             return dlvm_lang_make_value_undefined();
     }
@@ -25,7 +45,7 @@ dlvm_lang_value_t dlvm_lang_interpret(dlvm_lang_ast_node_t* ast) {
 
 dlvm_lang_value_t dlvm_lang_interpret_unary(dlvm_lang_ast_node_t* unary) {
     assert(unary->kind & DLVM_LANG_IS_UNARY);
-    dlvm_lang_value_t child_value = dlvm_lang_interpret(unary->unary.child);
+    dlvm_lang_value_t child_value = dlvm_lang_interpret_expression(unary->unary.child);
 
     switch (unary->kind) {
         case DLVM_LANG_AST_UNARY_PRINT:
@@ -48,8 +68,8 @@ static double to_double(dlvm_lang_value_t value) {
 
 dlvm_lang_value_t dlvm_lang_interpret_binary(dlvm_lang_ast_node_t* binary) {
     assert(binary->kind & DLVM_LANG_IS_BINARY);
-    dlvm_lang_value_t left_value = dlvm_lang_interpret(binary->binary.left);
-    dlvm_lang_value_t right_value = dlvm_lang_interpret(binary->binary.right);
+    dlvm_lang_value_t left_value = dlvm_lang_interpret_expression(binary->binary.left);
+    dlvm_lang_value_t right_value = dlvm_lang_interpret_expression(binary->binary.right);
 
     if (left_value.kind == DLVM_LANG_VALUE_UNDEFINED)
         return left_value;

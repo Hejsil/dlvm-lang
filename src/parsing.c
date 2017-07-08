@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include "parsing.h"
+#include "ast.h"
 
 #define EOT '\0'
 #define NEWLINE '\n'
@@ -135,6 +136,10 @@ dlvm_lang_token_t dlvm_lang_eat_token(dlvm_lang_scanner_t* scanner) {
             scanner->peek.svalue[size - 1] = '\0';
             break;
 
+        case '\0':
+            scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_EOF, position);
+            break;
+
         default:
             scanner->peek = dlvm_lang_make_token(DLVM_LANG_TOKEN_UNKNOWN, position);
             break;
@@ -146,6 +151,22 @@ dlvm_lang_token_t dlvm_lang_eat_token(dlvm_lang_scanner_t* scanner) {
 void dlvm_lang_skip(dlvm_lang_scanner_t* scanner) {
     while (isspace(dlvm_lang_peek_char(scanner)))
         dlvm_lang_eat_char(scanner);
+}
+
+dlvm_lang_ast_node_t *dlvm_lang_parse_statements(dlvm_lang_scanner_t *scanner) {
+    dlvm_lang_ast_node_t* result = dlvm_lang_alloc_ast_statements(scanner->peek.position);
+
+    while (scanner->peek.kind != DLVM_LANG_TOKEN_EOF) {
+        dlvm_lang_ast_node_t* expr = dlvm_lang_parse_expression(scanner);
+        if (expr == NULL) {
+            dlvm_lang_dealloc_ast(result);
+            return NULL;
+        }
+
+        arraylist_add_last(&result->statements.children, &expr);
+    }
+
+    return result;
 }
 
 dlvm_lang_ast_node_t* dlvm_lang_parse_expression(dlvm_lang_scanner_t* scanner) {
