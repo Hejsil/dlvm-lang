@@ -2,8 +2,19 @@
 #include "src/parsing.h"
 #include "src/hp_inkjet.h"
 #include "src/interpret.h"
+#include <inttypes.h>
+#include "src/data_structures/array.h"
+#include "src/data_structures/basic.h"
 
 int main() {
+    int b_data[100] = { 22, 22 };
+    array_t(int) b = { .data = b_data, .capacity = sizeof(b_data) / sizeof(int) };
+
+    foreach_ptr(array, item, array_slice_from_length(b, 1, 50)) {
+        printf("[%d] = %d\n", (int)it.index, *item);
+    }
+
+    return 0;
     
     char buffer[1000];
 
@@ -23,36 +34,42 @@ int main() {
     return 0;
     /**/
 
-    dlvm_lang_scanner_t scanner = dlvm_lang_make_scanner(
-        "print print \"Hello World\n\""
-        "print print 5 + 5.0 " // TODO, parsing many statements
-        "print 2"
-        "print 100"
-    );
-    dlvm_lang_ast_node_t* ast = dlvm_lang_parse_statements(&scanner);
-    //dlvm_lang_print_ast(ast, 0);
+    arraylist_t int_array = arraylist_make(int32_t);
 
-    dlvm_lang_interpret(ast);
+    arraylist_add_last(&int_array, 32);
+    arraylist_add_last(&int_array, 2);
+    arraylist_add_last(&int_array, 5);
+    arraylist_set(&int_array, int, 0, 20);
 
-    dlvm_lang_dealloc_ast(ast);
-
-    /*
-    while (scanner.peek.kind != DLVM_LANG_TOKEN_UNKNOWN) {
-        dlvm_lang_token_t token = dlvm_lang_eat_token(&scanner);
-
-        switch (token.kind) {
-            case DLVM_LANG_TOKEN_NUMBER:
-                printf("{ kind = %s, ivalue = %d }\n", "NUMBER", token.ivalue) ;
-                break;
-            case DLVM_LANG_TOKEN_ADD:
-                printf("{ kind = %s }\n", "PLUS") ;
-                break;
-            case DLVM_LANG_TOKEN_UNKNOWN:
-                printf("{ kind = %s }\n", "UNKNOWN") ;
-                break;
-        }
+    arraylist_verbose_foreach(int, item, item_ptr, it, int_array) {
+        printf("array[%d] = %d, %p\n", it, item, item_ptr);
     }
-    /**/
+
+    arraylist_ptr_foreach(int, item_ptr, it, int_array) {
+        printf("array[%d] = %p\n", it, item_ptr);
+    }
+
+    arraylist_foreach(int, item, it, int_array) {
+        printf("array[%d] = %d\n", it, item);
+    }
+
+    scanner_t scanner = make_scanner(
+            "var i = 2" // TODO, parsing many statements
+
+                    "print \"Hello World\n\""
+                    "print 5 + 5.0"
+                    "print \"\n\""
+                    "print 2"
+                    "print \"\n\""
+                    "print 100"
+                    "print \"\n\""
+    );
+    ast_node_t* ast = parse_statements(&scanner);
+    print_ast(ast, 0);
+
+    //interpret_ast(ast);
+
+    dealloc_ast(ast);
 
     return 0;
 }

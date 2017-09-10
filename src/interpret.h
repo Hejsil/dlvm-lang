@@ -2,18 +2,22 @@
 #include <inttypes.h>
 #include "ast.h"
 
-typedef struct dlvm_lang_compiler_s {
+typedef struct compiler_s {
     
-} dlvm_lang_compiler_t;
+} compiler_t;
 
-typedef enum dlvm_lang_value_kind_e {
+typedef struct interpreter_s {
+
+} interpreter_t;
+
+typedef enum value_kind_e {
     DLVM_LANG_VALUE_INT,
     DLVM_LANG_VALUE_FLOAT,
     DLVM_LANG_VALUE_STRING,
     DLVM_LANG_VALUE_UNDEFINED
-} dlvm_lang_value_kind_t;
+} value_kind_t;
 
-typedef struct dlvm_lang_value_s {
+typedef struct value_s {
     uint8_t kind;
 
     union {
@@ -21,18 +25,18 @@ typedef struct dlvm_lang_value_s {
         double fvalue;
         char* svalue;
     };
-} dlvm_lang_value_t;
+} value_t;
 
 // AST functions
-void dlvm_lang_interpret(dlvm_lang_ast_node_t* ast);
-dlvm_lang_value_t dlvm_lang_interpret_expression(dlvm_lang_ast_node_t* expr);
-dlvm_lang_value_t dlvm_lang_interpret_binary(dlvm_lang_ast_node_t* add);
-dlvm_lang_value_t dlvm_lang_interpret_unary(dlvm_lang_ast_node_t* unary);
+void interpret_ast(ast_node_t *ast);
+value_t interpret_expression(ast_node_t *expr);
+value_t interpret_binary(ast_node_t *add);
+value_t interpret_unary(ast_node_t *unary);
 
 // Value functions
-dlvm_lang_value_t dlvm_lang_make_value_int(int64_t value);
-dlvm_lang_value_t dlvm_lang_make_value_float(double value);
-dlvm_lang_value_t dlvm_lang_make_value_string(char* value);
-dlvm_lang_value_t dlvm_lang_make_value_undefined();
+value_t make_value_int(int64_t value);
+value_t make_value_float(double value);
+value_t make_value_string(char *value);
+value_t make_value_undefined();
 
-void dlvm_lang_print_value(dlvm_lang_value_t value);
+void print_value(value_t value);

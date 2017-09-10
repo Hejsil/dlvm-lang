@@ -10,10 +10,6 @@ set(
     libs/dlvm/src/types.h
     libs/dlvm/src/vm.c
     libs/dlvm/src/vm.h
-    src/backends/c_emitter.c
-    src/backends/c_emitter.h
-    src/backends/dlvm_emitter.c
-    src/backends/dlvm_emitter.h
     src/ast.c
     src/ast.h
     src/hp_inkjet.c
@@ -23,6 +19,9 @@ set(
     src/parsing.c
     src/parsing.h
     main.c
-        src/data_structures/arraylist.c src/data_structures/arraylist.h)
+    src/data_structures/arraylist.c
+    src/data_structures/arraylist.h
+    src/data_structures/map.c
+    src/data_structures/map.h src/data_structures/array.c src/data_structures/array.h src/data_structures/basic.c src/data_structures/basic.h)
 
 add_executable(dlvm_lang ${SOURCE_FILES})

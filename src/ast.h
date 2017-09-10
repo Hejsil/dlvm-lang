@@ -5,68 +5,73 @@
 #define DLVM_LANG_IS_BINARY 0x80
 #define DLVM_LANG_IS_UNARY 0x40
 
-typedef struct dlvm_lang_position_s {
+typedef struct string_position_s {
     int64_t index, line, column;
-} dlvm_lang_position_t;
+} string_position_t;
 
-typedef enum dlvm_lang_token_kind_e {
-    DLVM_LANG_TOKEN_INT       = 0x00,
-    DLVM_LANG_TOKEN_FLOAT     = 0x01,
-    DLVM_LANG_TOKEN_STRING    = 0x02,
+typedef enum token_kind_e {
+    TOKEN_INT           = 0x00,
+    TOKEN_FLOAT         = 0x01,
+    TOKEN_STRING        = 0x02,
+    TOKEN_KEYWORD_VAR   = 0x03,
+    TOKEN_IDENTIFIER    = 0x04,
+    TOKEN_EQUAL         = 0x05,
 
-    DLVM_LANG_TOKEN_PAR_LEFT  = 0x10,
-    DLVM_LANG_TOKEN_PAR_RIGHT = 0x11,
+    TOKEN_PAR_LEFT      = 0x10,
+    TOKEN_PAR_RIGHT     = 0x11,
 
-    DLVM_LANG_TOKEN_PRINT     = 0x00 | DLVM_LANG_IS_UNARY,
+    TOKEN_KEYWORD_PRINT = 0x00 | DLVM_LANG_IS_UNARY,
 
-    DLVM_LANG_TOKEN_ADD       = 0x00 | DLVM_LANG_IS_BINARY,
-    DLVM_LANG_TOKEN_SUB       = 0x01 | DLVM_LANG_IS_BINARY,
-    DLVM_LANG_TOKEN_MUL       = 0x02 | DLVM_LANG_IS_BINARY,
-    DLVM_LANG_TOKEN_DIV       = 0x03 | DLVM_LANG_IS_BINARY,
+    TOKEN_ADD           = 0x00 | DLVM_LANG_IS_BINARY,
+    TOKEN_SUB           = 0x01 | DLVM_LANG_IS_BINARY,
+    TOKEN_MUL           = 0x02 | DLVM_LANG_IS_BINARY,
+    TOKEN_DIV           = 0x03 | DLVM_LANG_IS_BINARY,
 
-    DLVM_LANG_TOKEN_EOF       = 0xFE & ~DLVM_LANG_IS_BINARY & ~DLVM_LANG_IS_UNARY,
-    DLVM_LANG_TOKEN_UNKNOWN   = 0xFF & ~DLVM_LANG_IS_BINARY & ~DLVM_LANG_IS_UNARY,
-} dlvm_lang_token_kind_t;
+    TOKEN_EOF           = 0xFE & ~DLVM_LANG_IS_BINARY & ~DLVM_LANG_IS_UNARY,
+    TOKEN_UNKNOWN       = 0xFF & ~DLVM_LANG_IS_BINARY & ~DLVM_LANG_IS_UNARY,
+} token_kind_t;
 
-typedef struct dlvm_lang_token_s {
+typedef struct token_s {
     uint8_t kind;
-    dlvm_lang_position_t position;
+    string_position_t position;
 
     union {
         int64_t ivalue;
         double fvalue;
         char* svalue;
     };
-} dlvm_lang_token_t;
+} token_t;
 
-typedef enum dlvm_lang_ast_kind_e {
-    DLVM_LANG_AST_LITERAL_INT = 0x00,
-    DLVM_LANG_AST_LITERAL_FLOAT = 0x01,
-    DLVM_LANG_AST_LITERAL_STRING = 0x02,
+typedef enum ast_kind_e {
+    AST_LITERAL_INT    = 0x00,
+    AST_LITERAL_FLOAT  = 0x01,
+    AST_LITERAL_STRING = 0x02,
 
-    DLVM_LANG_AST_BINARY_ADD  = DLVM_LANG_TOKEN_ADD,
-    DLVM_LANG_AST_BINARY_SUB  = DLVM_LANG_TOKEN_SUB,
-    DLVM_LANG_AST_BINARY_MUL  = DLVM_LANG_TOKEN_MUL,
-    DLVM_LANG_AST_BINARY_DIV  = DLVM_LANG_TOKEN_DIV,
+    AST_BINARY_ADD     = TOKEN_ADD,
+    AST_BINARY_SUB     = TOKEN_SUB,
+    AST_BINARY_MUL     = TOKEN_MUL,
+    AST_BINARY_DIV     = TOKEN_DIV,
 
-    DLVM_LANG_AST_UNARY_PRINT = DLVM_LANG_TOKEN_PRINT,
-    DLVM_LANG_AST_UNARY_PAR   = 0x01 | DLVM_LANG_IS_UNARY,
+    AST_UNARY_PRINT    = TOKEN_KEYWORD_PRINT,
+    AST_UNARY_PAR      = 0x01 | DLVM_LANG_IS_UNARY,
 
-    DLVM_LANG_AST_STATEMENTS = 0x10
-} dlvm_lang_ast_kind_t;
+    AST_STATEMENTS     = 0x10,
+    AST_DECL           = 0x11,
+    AST_SYMBOL         = 0x12
+} ast_kind_t;
 
-typedef struct dlvm_lang_ast_node_s {
+typedef struct ast_node_s {
     uint8_t kind;
-    dlvm_lang_position_t position;
+    string_position_t position;
 
     union {
         struct {
-            struct dlvm_lang_ast_node_s* left;
-            struct dlvm_lang_ast_node_s* right;
+            struct ast_node_s* left;
+            struct ast_node_s* right;
         } binary;
 
         struct {
-            struct dlvm_lang_ast_node_s* child;
+            struct ast_node_s* child;
         } unary;
 
         struct {
@@ -82,30 +87,42 @@ typedef struct dlvm_lang_ast_node_s {
         } string_lit;
 
         struct {
+            char* name;
+        } symbol;
+
+        struct {
             arraylist_t children;
         } statements;
+
+        struct {
+            char* name;
+            struct ast_node_s* value;
+        } decl;
     };
-} dlvm_lang_ast_node_t;
+} ast_node_t;
 
-dlvm_lang_position_t dlvm_lang_make_position(int64_t index, int64_t line, int64_t column);
-dlvm_lang_token_t dlvm_lang_make_token(uint8_t kind, dlvm_lang_position_t position);
+string_position_t make_position(int64_t index, int64_t line, int64_t column);
+token_t make_token(uint8_t kind, string_position_t position);
 
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast(dlvm_lang_position_t position, uint8_t ast_kind);
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_unary(dlvm_lang_position_t position, uint8_t ast_kind, dlvm_lang_ast_node_t* child);
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_binary(dlvm_lang_position_t position, uint8_t ast_kind, dlvm_lang_ast_node_t* left, dlvm_lang_ast_node_t* right);
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_int_lit(dlvm_lang_position_t position, int64_t value);
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_float_lit(dlvm_lang_position_t position, double value);
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_string_lit(dlvm_lang_position_t position, char* value);
-dlvm_lang_ast_node_t* dlvm_lang_alloc_ast_statements(dlvm_lang_position_t position);
+ast_node_t* alloc_ast(string_position_t position, uint8_t ast_kind);
+ast_node_t* alloc_ast_unary(string_position_t position, uint8_t ast_kind, ast_node_t *child);
+ast_node_t* alloc_ast_binary(string_position_t position, uint8_t ast_kind, ast_node_t *left, ast_node_t *right);
+ast_node_t* alloc_ast_int_lit(string_position_t position, int64_t value);
+ast_node_t* alloc_ast_float_lit(string_position_t position, double value);
+ast_node_t* alloc_ast_string_lit(string_position_t position, char *value);
+ast_node_t* alloc_ast_statements(string_position_t position);
+ast_node_t* alloc_ast_decl(string_position_t position, char *name, ast_node_t *value);
+ast_node_t* alloc_ast_symbol(string_position_t position, char *name);
 
-void dlvm_lang_init_ast(dlvm_lang_ast_node_t* ast, dlvm_lang_position_t position, uint8_t ast_kind);
-void dlvm_lang_init_ast_unary(dlvm_lang_ast_node_t* unary, dlvm_lang_position_t position, uint8_t ast_kind, dlvm_lang_ast_node_t* child);
-void dlvm_lang_init_ast_binary(dlvm_lang_ast_node_t* binary, dlvm_lang_position_t position, uint8_t ast_kind, dlvm_lang_ast_node_t* left, dlvm_lang_ast_node_t* right);
-void dlvm_lang_init_ast_int_lit(dlvm_lang_ast_node_t* int_lit, dlvm_lang_position_t position, int64_t value);
-void dlvm_lang_init_ast_float_lit(dlvm_lang_ast_node_t* float_lit, dlvm_lang_position_t position, double value);
-void dlvm_lang_init_ast_string_lit(dlvm_lang_ast_node_t* string_lit, dlvm_lang_position_t position, char* value);
-void dlvm_lang_init_ast_statements(dlvm_lang_ast_node_t* statements, dlvm_lang_position_t position);
+void init_ast(ast_node_t *ast, string_position_t position, uint8_t ast_kind);
+void init_ast_unary(ast_node_t *unary, string_position_t position, uint8_t ast_kind, ast_node_t *child);
+void init_ast_binary(ast_node_t *binary, string_position_t position, uint8_t ast_kind, ast_node_t *left, ast_node_t *right);
+void init_ast_int_lit(ast_node_t *int_lit, string_position_t position, int64_t value);
+void init_ast_float_lit(ast_node_t *float_lit, string_position_t position, double value);
+void init_ast_string_lit(ast_node_t *string_lit, string_position_t position, char *value);
+void init_ast_statements(ast_node_t *statements, string_position_t position);
+void init_ast_decl(ast_node_t *decl, string_position_t position, char *name, ast_node_t *value);
+void init_ast_symbol(ast_node_t *decl, string_position_t position, char *name);
 
-
-void dlvm_lang_dealloc_ast(dlvm_lang_ast_node_t* ast);
-void dlvm_lang_deinit_ast(dlvm_lang_ast_node_t* ast);
+void dealloc_ast(ast_node_t *ast);
+void deinit_ast(ast_node_t *ast);
