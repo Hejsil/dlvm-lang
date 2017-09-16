@@ -4,26 +4,6 @@
 #include <assert.h>
 #include <stdbool.h>
 
-#define arraylist_all_foreach(item_type, item_name, item_ptr_name, end_ptr_name, index_name, arraylist)    \
-static_assert(sizeof(arraylist_t) == sizeof(arraylist), "An arraylist must be passed to this macro");      \
-assert(sizeof(item_type) == (arraylist).item_size);                                                        \
-for (int index_name = 0; (index_name) != 1;)                                                               \
-for (item_type* item_ptr_name = (item_type*)arraylist_unsafe_get_void_ptr(&(arraylist), 0),                \
-              * end_ptr_name = (item_type*)arraylist_unsafe_get_void_ptr(&(arraylist), (arraylist).count); \
-     (index_name) != 1;                                                                                    \
-     (index_name) = 1)                                                                                     \
-for (item_type item_name = *(item_ptr_name);                                                               \
-     (item_ptr_name) != (end_ptr_name) ;                                                                   \
-     (index_name)++, (item_ptr_name)++, (item_name) = *(item_ptr_name))
-
-#define arraylist_verbose_foreach(item_type, item_name, item_ptr_name, index_name, arraylist)              \
-arraylist_all_foreach(item_type, item_name, item_ptr_name, __end_ptr_name_ ## __COUNTER__, index_name, arraylist)
-
-#define arraylist_ptr_foreach(item_type, item_ptr_name, index_name, arraylist)                             \
-arraylist_verbose_foreach(item_type, __temp_item_name__ ## __COUNTER__, item_ptr_name, index_name, arraylist)
-
-#define arraylist_foreach(item_type, item_name, index_name, arraylist)                                     \
-arraylist_verbose_foreach(item_type, item_name, __temp_ptr_name__ ## __COUNTER__, index_name, arraylist)
 
 typedef struct {
     void* data;

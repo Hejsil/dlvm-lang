@@ -7,10 +7,11 @@
 #include "src/data_structures/basic.h"
 
 int main() {
-    int b_data[100] = { 22, 22 };
+    int b_data[10] = { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20 };
     array_t(int) b = { .data = b_data, .capacity = sizeof(b_data) / sizeof(int) };
+    array_t(int) c = array_slice_from_to(b, 5, 10);
 
-    foreach_ptr(array, item, array_slice_from_length(b, 1, 50)) {
+    foreach_ptr(rev_array, item, c) {
         printf("[%d] = %d\n", (int)it.index, *item);
     }
 
@@ -41,28 +42,15 @@ int main() {
     arraylist_add_last(&int_array, 5);
     arraylist_set(&int_array, int, 0, 20);
 
-    arraylist_verbose_foreach(int, item, item_ptr, it, int_array) {
-        printf("array[%d] = %d, %p\n", it, item, item_ptr);
-    }
-
-    arraylist_ptr_foreach(int, item_ptr, it, int_array) {
-        printf("array[%d] = %p\n", it, item_ptr);
-    }
-
-    arraylist_foreach(int, item, it, int_array) {
-        printf("array[%d] = %d\n", it, item);
-    }
-
     scanner_t scanner = make_scanner(
             "var i = 2" // TODO, parsing many statements
-
-                    "print \"Hello World\n\""
-                    "print 5 + 5.0"
-                    "print \"\n\""
-                    "print 2"
-                    "print \"\n\""
-                    "print 100"
-                    "print \"\n\""
+            "print \"Hello World\n\""
+            "print 5 + 5.0"
+            "print \"\n\""
+            "print 2"
+            "print \"\n\""
+            "print 100"
+            "print \"\n\""
     );
     ast_node_t* ast = parse_statements(&scanner);
     print_ast(ast, 0);
